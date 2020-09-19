@@ -40,6 +40,15 @@
 
 ## N叉树遍历
 + 前序遍历，遵循二叉树的前序遍历原则。
+  ```
+  private void preorder(Node root, List<Integer> list) {
+    if(root == null) return;
+    list.add(root.val);
+    for(int i = 0; i < root.children.size(); i++) {
+      preorder(root.children.get(i), list);
+    }
+  }
+  ```
 + 中序遍历，遵循二叉树的中序遍历原则。
 + 后序遍历，遵循二叉树的后序遍历原则。
 
