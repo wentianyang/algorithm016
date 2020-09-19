@@ -49,8 +49,16 @@
     }
   }
   ```
-+ 中序遍历，遵循二叉树的中序遍历原则。
 + 后序遍历，遵循二叉树的后序遍历原则。
+  ```
+  private void postorder(Node root, List<Integer> list) {
+    if(root == null) return;
+    for(Node n : root.children){
+      postorder(n, list);
+    }
+    list.add(root.val);
+  }
+  ```
 
 ## 堆
 Heap: 可以迅速找到一堆数中的最大值或者最小值的数据结构。
