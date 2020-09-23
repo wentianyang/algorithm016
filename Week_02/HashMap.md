@@ -86,3 +86,80 @@ Java 中的HashMap
     }
    ```
 ## resize()扩容原理
+1. 检查数组长度是否大于0，
+   (1) 检查是否超过最大的容量，如果超过则将阈值设置为Integer.MAX_VALUE，并直接返回原来的数组
+   (2) 如果没超过最大容量，则扩容为原来的两倍
+2. 检查阈值是否大于0,如果大于0，则新的容量等于这个阈值
+3. 初始化默认的容量 DEFAULT_INITIAL_CAPACITY(16)，初始化默认的阈值(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY)
+```
+if (oldCap > 0) {
+    if (oldCap >= MAXIMUM_CAPACITY) {
+        threshold = Integer.MAX_VALUE;
+        return oldTab;
+    }
+    else if ((newCap = oldCap << 1) < MAXIMUM_CAPACITY && oldCap >= DEFAULT_INITIAL_CAPACITY)
+        newThr = oldThr << 1; // double threshold
+}
+else if (oldThr > 0) // initial capacity was placed in threshold
+    newCap = oldThr;
+else {               // zero initial threshold signifies using defaults
+    newCap = DEFAULT_INITIAL_CAPACITY;
+    newThr = (int)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
+}
+```
+4. 如果旧数组不为null，则将旧数据转移到新数组中
+   (1) 如果不是链表(if (e.next == null))，则直接计算出索引值添加到新数组
+   (2) 检查是不是TreeNode
+   (3) 遍历链表，如果(e.hash & oldCap) == 0，则索引的位置不变，否则会重新计算新的索引，新的索引是 j(当前索引) + oldCap(旧容量)
+```
+    if (oldTab != null) {
+        for (int j = 0; j < oldCap; ++j) {
+            Node<K,V> e;
+            if ((e = oldTab[j]) != null) {
+                oldTab[j] = null;
+                if (e.next == null)
+                    newTab[e.hash & (newCap - 1)] = e;
+                else if (e instanceof TreeNode)
+                    ((TreeNode<K,V>)e).split(this, newTab, j, oldCap);
+                else { // preserve order
+                    Node<K,V> loHead = null, loTail = null;
+                    Node<K,V> hiHead = null, hiTail = null;
+                    Node<K,V> next;
+                    do {
+                        next = e.next;
+                        if ((e.hash & oldCap) == 0) {
+                            if (loTail == null)
+                                loHead = e;
+                            else
+                                loTail.next = e;
+                            loTail = e;
+                        }
+                        else {
+                            if (hiTail == null)
+                                hiHead = e;
+                            else
+                                hiTail.next = e;
+                            hiTail = e;
+                        }
+                    } while ((e = next) != null);
+                    if (loTail != null) {
+                        loTail.next = null;
+                        newTab[j] = loHead;
+                    }
+                    if (hiTail != null) {
+                        hiTail.next = null;
+                        newTab[j + oldCap] = hiHead;
+                    }
+                }
+            }
+        }
+    }
+```
+## hash方法的实现
+1. 如果key为null，则默认的索引是0
+```
+static final int hash(Object key) {
+    int h;
+    return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+}
+```
