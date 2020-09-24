@@ -1,7 +1,11 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.tree.TreeNode;
+
+import jdk.internal.jimage.ImageReader.Node;
+import sun.security.mscapi.CKeyStore.ROOT;
 
 /*
  * @lc app=leetcode.cn id=144 lang=java
@@ -44,17 +48,21 @@ import javax.swing.tree.TreeNode;
 class Solution {
     public List<Integer> preorderTraversal(TreeNode root) {
         List<Integer> result = new ArrayList<>();
-        preorder(root, result);
-        return result;
-    }
-
-    private void preorder(TreeNode root, List<Integer> list) {
-        if (root == null) {
-            return;
+        if (root == null)
+            return result;
+        LinkedList<TreeNode> stack = new LinkedList<>();
+        stack.add(root);
+        while (!stack.isEmpty()) {
+            TreeNode cur = stack.pollLast();
+            result.add(cur.val);
+            if (cur.right != null) {
+                stack.add(cur.right);
+            }
+            if (cur.left != null) {
+                stack.add(cur.left);
+            }
         }
-        list.add(root.val);
-        preorder(root.left, list);
-        preorder(root.right, list);
+        return result;
     }
 }
 // @lc code=end

@@ -1,3 +1,4 @@
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.tree.TreeNode;
@@ -44,7 +45,16 @@ import javax.swing.tree.TreeNode;
 class Solution {
     public List<Integer> postorderTraversal(TreeNode root) {
         List<Integer> result = new ArrayList<>();
-        postorder(root, result);
+        LinkedList<TreeNode> stack = new LinkedList<>();
+        while (root != null || !stack.isEmpty()) {
+            while (root != null) {
+                stack.add(root);
+                root = root.left;
+            }
+            root = stack.pollLast();
+            result.add(top.val);
+            root = stack.peekLast().right;
+        }
         return result;
     }
 

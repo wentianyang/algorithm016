@@ -1,3 +1,4 @@
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.tree.TreeNode;
@@ -40,9 +41,18 @@ import javax.swing.tree.TreeNode;
  * left; TreeNode right; TreeNode(int x) { val = x; } }
  */
 class Solution {
-    public List<Integer> inorderTraversal(final TreeNode root) {
+    public List<Integer> inorderTraversal(TreeNode root) {
         final List<Integer> result = new ArrayList();
-        inorder(root, result);
+        final LinkedList<TreeNode> stack = new LinkedList<>();
+        while (root != null || !stack.isEmpty()) {
+            while (root != null) {
+                stack.add(root);
+                root = root.left;
+            }
+            root = stack.pollLast();
+            result.add(root.val);
+            root = root.right;
+        }
         return result;
     }
 
